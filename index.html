@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SEO Content QA Prompt Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+
+/* ══════════════════════════════════════
+   THEME DEFINITIONS
+   ══════════════════════════════════════
+
+   MIDNIGHT  — Late night / dark room
+               Deep navy + warm amber.
+               Warm amber reduces blue-light.
+
+   DAYLIGHT  — Daytime / bright office
+               Warm cream + deep teal.
+               Not harsh pure-white; reduces glare.
+
+   DUSK      — Evening / golden hour
+               Dark warm brown + soft gold.
+               Mimics candlelight warmth.
+
+   FOREST    — Long sessions / any time
+               Deep forest green + mint.
+               Green wavelength = least eye fatigue.
+*/
+
+:root,
+[data-theme="midnight"] {
+  --bg:           #0d0f14;
+  --surface:      #13161e;
+  --surface2:     #1a1e2a;
+  --border:       #252836;
+  --border-hi:    #353a52;
+  --accent:       #f5a623;
+  --accent-dim:   #c4841a;
+  --accent-glow:  rgba(245,166,35,0.12);
+  --green:        #3ecf8e;
+  --red:          #ff5c5c;
+  --yellow:       #f5d76e;
+  --text:         #e2e4ef;
+  --text-dim:     #7a7f9a;
+  --text-muted:   #454a62;
+  --btn-fg:       #0d0f14;
+  --s-head:       #f5a623;
+  --s-fill:       #3ecf8e;
+  --s-dim:        #454a62;
+  --s-red:        #ff5c5c;
+  --s-yellow:     #f5d76e;
+}
+
+[data-theme="daylight"] {
+  --bg:           #f4efe4;
+  --surface:      #fdfaf3;
+  --surface2:     #ece6d8;
+  --border:       #d5ccb8;
+  --border-hi:    #b8ac96;
+  --accent:       #0d7377;
+  --accent-dim:   #0a5c60;
+  --accent-glow:  rgba(13,115,119,0.10);
+  --green:        #1a7a4a;
+  --red:          #c0392b;
+  --yellow:       #9a6200;
+  --text:         #1e1c18;
+  --text-dim:     #574f42;
+  --text-muted:   #9a9080;
+  --btn-fg:       #fdfaf3;
+  --s-head:       #0d7377;
+  --s-fill:       #1a7a4a;
+  --s-dim:        #9a9080;
+  --s-red:        #c0392b;
+  --s-yellow:     #9a6200;
+}
+
+[data-theme="dusk"] {
+  --bg:           #191008;
+  --surface:      #22170c;
+  --surface2:     #2c1f10;
+  --border:       #3e2c16;
+  --border-hi:    #5c4220;
+  --accent:       #e8b86d;
+  --accent-dim:   #c4922a;
+  --accent-glow:  rgba(232,184,109,0.13);
+  --green:        #82c87e;
+  --red:          #e07878;
+  --yellow:       #f0d080;
+  --text:         #ede0c4;
+  --text-dim:     #8c7a5c;
+  --text-muted:   #5a4830;
+  --btn-fg:       #191008;
+  --s-head:       #e8b86d;
+  --s-fill:       #82c87e;
+  --s-dim:        #5a4830;
+  --s-red:        #e07878;
+  --s-yellow:     #f0d080;
+}
+
+[data-theme="forest"] {
+  --bg:           #06100a;
+  --surface:      #0c1a10;
+  --surface2:     #122016;
+  --border:       #1c3022;
+  --border-hi:    #284234;
+  --accent:       #4ee0a0;
+  --accent-dim:   #28b87a;
+  --accent-glow:  rgba(78,224,160,0.11);
+  --green:        #4ee0a0;
+  --red:          #f07878;
+  --yellow:       #d4e070;
+  --text:         #c4e8d0;
+  --text-dim:     #6a9870;
+  --text-muted:   #365842;
+  --btn-fg:       #06100a;
+  --s-head:       #4ee0a0;
+  --s-fill:       #d4e070;
+  --s-dim:        #365842;
+  --s-red:        #f07878;
+  --s-yellow:     #d4e070;
+}
+
+/* ══════════════════════════════════════
+   GLOBAL BASE
+   ══════════════════════════════════════ */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  min-height: 100vh;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* ── HEADER ── */
+header {
+  border-bottom: 1px solid var(--border);
+  padding: 13px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  background: var(--surface);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  transition: background 0.3s, border-color 0.3s;
+  flex-wrap: wrap;
+}
+.header-left { display: flex; align-items: center; gap: 12px; }
+.logo {
+  font-family: 'Syne', sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+.logo span { color: var(--accent); }
+.badge {
+  font-size: 9px;
+  background: var(--accent-glow);
+  color: var(--accent);
+  border: 1px solid var(--accent-dim);
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ── THEME SWITCHER ── */
+.theme-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  padding: 5px 8px;
+  transition: background 0.3s, border-color 0.3s;
+}
+.theme-label {
+  font-family: 'Syne', sans-serif;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 0 4px 0 2px;
+  white-space: nowrap;
+}
+.theme-btn {
+  border: none;
+  border-radius: 30px;
+  padding: 5px 11px;
+  font-family: 'Syne', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: transparent;
+  color: var(--text-dim);
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.theme-btn:hover { color: var(--accent); background: var(--accent-glow); }
+.theme-btn.active {
+  background: var(--accent);
+  color: var(--btn-fg);
+  box-shadow: 0 2px 12px var(--accent-glow);
+}
+
+/* ── CONTAINER ── */
+.container {
+  max-width: 1110px;
+  margin: 0 auto;
+  padding: 28px 22px 80px;
+  display: grid;
+  grid-template-columns: 395px 1fr;
+  gap: 22px;
+  align-items: start;
+}
+
+/* ── HOW-TO STRIP ── */
+.how-strip {
+  grid-column: 1 / -1;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 11px 18px;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 2px;
+  transition: background 0.3s, border-color 0.3s;
+}
+.step { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-dim); }
+.step-num {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--accent-glow);
+  border: 1px solid var(--accent-dim);
+  color: var(--accent);
+  font-family: 'Syne', sans-serif;
+  font-size: 10px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.arrow { color: var(--text-muted); }
+
+/* ── LEFT INPUT PANEL ── */
+.input-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  position: sticky;
+  top: 60px;
+  transition: background 0.3s, border-color 0.3s;
+}
+.panel-hdr {
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 18px;
+  display: flex; align-items: center; gap: 9px;
+  transition: background 0.3s;
+}
+.panel-hdr h2 {
+  font-family: 'Syne', sans-serif;
+  font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--accent);
+}
+.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+.panel-body { padding: 16px 18px; display: flex; flex-direction: column; gap: 13px; }
+
+.field label {
+  display: block;
+  font-size: 9px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--text-dim); margin-bottom: 5px;
+  font-family: 'Syne', sans-serif;
+}
+.field label .req { color: var(--accent); margin-left: 2px; }
+.field label .opt {
+  color: var(--text-muted); font-size: 8.5px;
+  text-transform: none; letter-spacing: 0;
+  font-family: 'JetBrains Mono', monospace; font-weight: 300;
+}
+.field input, .field textarea {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  padding: 9px 12px;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.3s, color 0.3s;
+  resize: vertical; outline: none;
+}
+.field input::placeholder, .field textarea::placeholder {
+  color: var(--text-muted); font-size: 10.5px;
+}
+.field input:focus, .field textarea:focus {
+  border-color: var(--accent-dim);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+.field textarea { min-height: 96px; }
+
+/* NEW FIELD — title gets a subtle highlight border */
+.field.title-field input {
+  border-color: var(--accent-dim);
+  background: var(--surface2);
+}
+
+/* ── ACTION BUTTONS ── */
+.btn-row {
+  display: flex; gap: 9px;
+  padding: 13px 18px;
+  border-top: 1px solid var(--border);
+  background: var(--surface2);
+  transition: background 0.3s;
+}
+.btn-copy {
+  flex: 1;
+  background: var(--accent);
+  color: var(--btn-fg);
+  border: none; border-radius: 8px;
+  padding: 11px 14px;
+  font-family: 'Syne', sans-serif;
+  font-size: 12.5px; font-weight: 700;
+  cursor: pointer; letter-spacing: 0.04em;
+  transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+}
+.btn-copy:hover { filter: brightness(1.13); transform: translateY(-1px); box-shadow: 0 4px 18px var(--accent-glow); }
+.btn-copy:active { transform: translateY(0); filter: none; }
+.btn-copy.copied { background: var(--green); filter: none; }
+
+.btn-clear {
+  background: transparent;
+  color: var(--text-dim);
+  border: 1px solid var(--border-hi);
+  border-radius: 8px;
+  padding: 11px 13px;
+  font-family: 'Syne', sans-serif;
+  font-size: 11px; font-weight: 600;
+  cursor: pointer; letter-spacing: 0.03em;
+  transition: all 0.2s;
+  display: flex; align-items: center; gap: 5px;
+  white-space: nowrap;
+}
+.btn-clear:hover { border-color: var(--red); color: var(--red); background: rgba(255,92,92,0.06); }
+
+/* ── RIGHT PROMPT PANEL ── */
+.prompt-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px; overflow: hidden;
+  transition: background 0.3s, border-color 0.3s;
+}
+.prompt-panel-hdr {
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 18px;
+  display: flex; align-items: center; justify-content: space-between;
+  transition: background 0.3s;
+}
+.prompt-panel-hdr h2 {
+  font-family: 'Syne', sans-serif;
+  font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--text-dim);
+}
+.live-badge {
+  font-size: 8.5px; font-family: 'Syne', sans-serif;
+  font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--green);
+  background: rgba(62,207,142,0.08);
+  border: 1px solid rgba(62,207,142,0.2);
+  padding: 2px 8px; border-radius: 20px;
+  display: flex; align-items: center; gap: 5px;
+}
+.live-badge::before {
+  content: ''; width: 5px; height: 5px;
+  background: var(--green); border-radius: 50%;
+  animation: pulse 1.4s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.25} }
+
+.prompt-body {
+  padding: 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.8px; line-height: 1.82;
+  color: var(--text);
+  white-space: pre-wrap; word-break: break-word;
+  max-height: calc(100vh - 155px);
+  overflow-y: auto;
+}
+.prompt-body::-webkit-scrollbar { width: 5px; }
+.prompt-body::-webkit-scrollbar-track { background: transparent; }
+.prompt-body::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 3px; }
+
+/* Syntax classes driven by CSS vars */
+.sh  { color: var(--s-head); font-weight: 500; }
+.sf  { color: var(--s-fill); font-weight: 500; }
+.sph { color: var(--s-dim); font-style: italic; }
+.sr  { color: var(--s-red); }
+.sy  { color: var(--s-yellow); }
+.sd  { color: var(--s-dim); }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--green); color: #040a06;
+  font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700;
+  padding: 11px 22px; border-radius: 10px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+  opacity: 0; transform: translateY(10px);
+  transition: all 0.3s cubic-bezier(0.175,0.885,0.32,1.275);
+  pointer-events: none; z-index: 999;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 820px) {
+  .container { grid-template-columns: 1fr; }
+  .input-panel { position: static; }
+  .prompt-body { max-height: 54vh; }
+  .theme-btn { padding: 4px 8px; font-size: 10px; }
+  .theme-label { display: none; }
+}
+</style>
+</head>
+<body data-theme="midnight">
+
+<!-- ═══════════════════════ HEADER ═══════════════════════ -->
+<header>
+  <div class="header-left">
+    <div class="logo">SEO <span>QA</span> Prompt Builder</div>
+    <div class="badge">v1.1</div>
+  </div>
+
+  <div class="theme-row">
+    <span class="theme-label">Theme</span>
+    <button class="theme-btn active" data-t="midnight" onclick="setTheme('midnight',this)">🌑 Midnight</button>
+    <button class="theme-btn"        data-t="daylight" onclick="setTheme('daylight',this)">☀️ Daylight</button>
+    <button class="theme-btn"        data-t="dusk"     onclick="setTheme('dusk',this)">🌅 Dusk</button>
+    <button class="theme-btn"        data-t="forest"   onclick="setTheme('forest',this)">🌿 Forest</button>
+  </div>
+</header>
+
+<!-- ═══════════════════════ MAIN ═══════════════════════ -->
+<div class="container">
+
+  <!-- HOW-TO -->
+  <div class="how-strip">
+    <div class="step"><div class="step-num">1</div>Fill inputs on the left</div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="step-num">2</div>Watch prompt update live →</div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="step-num">3</div>Click <strong style="color:var(--accent)">&nbsp;Copy Full Prompt&nbsp;</strong></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="step-num">4</div>Paste into ChatGPT / Gemini / Claude</div>
+  </div>
+
+  <!-- LEFT: INPUTS -->
+  <div class="input-panel">
+    <div class="panel-hdr">
+      <div class="dot"></div>
+      <h2>Content / Articles Key Points</h2>
+    </div>
+    <div class="panel-body">
+
+      <div class="field title-field">
+        <label>Article / Content Title <span class="req">*</span></label>
+        <input type="text" id="f_title" placeholder="e.g. 5-Letter Words With A — Full Wordle List">
+      </div>
+
+      <div class="field">
+        <label>Primary Keyword <span class="req">*</span></label>
+        <input type="text" id="f_primary" placeholder="e.g. 5 letter words with A">
+      </div>
+
+      <div class="field">
+        <label>Supporting / LSI Keywords <span class="req">*</span></label>
+        <input type="text" id="f_lsi" placeholder="e.g. Wordle words, vowel words, word list">
+      </div>
+
+      <div class="field">
+        <label>Content Niche / Topic <span class="req">*</span></label>
+        <input type="text" id="f_niche" placeholder="e.g. Word Games, Health, Finance, Travel">
+      </div>
+
+      <div class="field">
+        <label>Target Audience <span class="req">*</span></label>
+        <input type="text" id="f_audience" placeholder="e.g. Casual Wordle players, Beginner investors">
+      </div>
+
+      <div class="field">
+        <label>Business Goal <span class="opt">(optional)</span></label>
+        <input type="text" id="f_goal" placeholder="e.g. AdSense revenue, Lead generation">
+      </div>
+
+      <div class="field">
+        <label>Full Article <span class="req">*</span></label>
+        <textarea id="f_article" placeholder="Paste your full article content here..."></textarea>
+      </div>
+
+    </div>
+    <div class="btn-row">
+      <button class="btn-copy" id="copyBtn" onclick="copyPrompt()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copy Full Prompt
+      </button>
+      <button class="btn-clear" onclick="clearInputs()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        Erase
+      </button>
+    </div>
+  </div>
+
+  <!-- RIGHT: LIVE PROMPT -->
+  <div class="prompt-panel">
+    <div class="prompt-panel-hdr">
+      <h2>Full Prompt Preview</h2>
+      <div class="live-badge">Live Preview</div>
+    </div>
+    <div class="prompt-body" id="promptPreview"></div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast">✓ Prompt copied to clipboard!</div>
+
+<!-- ═══════════════════════ SCRIPT ═══════════════════════ -->
+<script>
+/* ── THEME ── */
+function setTheme(name, btn) {
+  document.body.setAttribute('data-theme', name);
+  document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  localStorage.setItem('seoqa-theme', name);
+}
+(function(){
+  const s = localStorage.getItem('seoqa-theme');
+  if (s) {
+    document.body.setAttribute('data-theme', s);
+    document.querySelectorAll('.theme-btn').forEach(b =>
+      b.classList.toggle('active', b.getAttribute('data-t') === s));
+  }
+})();
+
+/* ── MASTER PROMPT TEMPLATE ── */
+const TPL = `ROLE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+You are a Principal SEO Content Auditor with 10+ years of
+experience in programmatic SEO, content strategy, and Google
+Quality Rater Guidelines. You audit content for one purpose:
+to determine if it can rank on Page 1 of Google, satisfy user
+intent completely, and outperform existing competitors.
+
+You are BRUTALLY HONEST. You do NOT give unearned praise.
+You do NOT write generic feedback. Every comment must be
+specific, evidence-based, and tied to a ranking impact.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Content / Articles Key Points
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ARTICLE / CONTENT TITLE:
+%%TITLE%%
+
+PRIMARY KEYWORD:
+%%PRIMARY%%
+
+SUPPORTING / LSI KEYWORDS:
+%%LSI%%
+
+CONTENT NICHE / TOPIC:
+%%NICHE%%
+
+TARGET AUDIENCE:
+%%AUDIENCE%%
+
+BUSINESS GOAL (optional):
+%%GOAL%%
+
+ARTICLE:
+%%ARTICLE%%
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+EVALUATION FRAMEWORK — 10 PILLARS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Score each pillar from 0 to 10. Be precise. Justify every
+score with 1–2 specific observations from the article.
+Do NOT round up scores generously.
+
+──────────────────────────────────────
+PILLAR 1 — SEARCH INTENT ALIGNMENT (0–10)
+──────────────────────────────────────
+• Does the article answer the primary query within the first
+  100 words (above the fold)?
+• Is the content format (list, guide, tool, table) the RIGHT
+  format for this keyword type?
+• Informational / Navigational / Transactional / Commercial
+  — does the article match the correct intent type?
+• Would a user immediately find what they came for, or do
+  they need to scroll excessively?
+
+Score: __ / 10
+Evidence: [Specific line or section from the article]
+
+──────────────────────────────────────
+PILLAR 2 — DATA ACCURACY & DEPTH (0–10)
+──────────────────────────────────────
+• Are all facts, lists, statistics, or claims accurate and
+  verifiable?
+• Is the content depth sufficient for the keyword's
+  competitiveness? (Thin content = low score)
+• Are there any outdated, incorrect, or misleading statements?
+• For word/list-based content: Are entries real, non-
+  repetitive, and sourced from a recognized authority
+  (e.g., Official Scrabble Dictionary, Merriam-Webster)?
+
+Score: __ / 10
+Evidence: [Specific line or section from the article]
+
+──────────────────────────────────────
+PILLAR 3 — STRUCTURE & SCANNABILITY (0–10)
+──────────────────────────────────────
+• Is there a clear H1 containing the primary keyword?
+• Are H2/H3 subheadings used logically and descriptively?
+• Are paragraphs kept under 3–4 lines for mobile readability?
+• Are bullet points, numbered lists, or tables used where
+  appropriate to aid scanning?
+• Does the visual hierarchy guide the reader's eye naturally?
+
+Score: __ / 10
+Evidence: [Specific line or section from the article]
+
+──────────────────────────────────────
+PILLAR 4 — ZERO-FLUFF COMPLIANCE (0–10)
+──────────────────────────────────────
+Instant FAIL indicators (any present = max score of 4):
+  ✗ "In this article, we will explore..."
+  ✗ "Welcome to our comprehensive guide..."
+  ✗ Repeated ideas in different words (padding)
+  ✗ Filler transitions that add no information
+  ✗ Conclusions that just restate the introduction
+
+• What percentage of sentences add NEW value to the reader?
+• Are there sections that exist only to inflate word count?
+
+Score: __ / 10
+Evidence: [Quote the exact fluff phrase if found]
+
+──────────────────────────────────────
+PILLAR 5 — KEYWORD OPTIMIZATION (0–10)
+──────────────────────────────────────
+• Primary keyword present in: Title / H1 / First paragraph /
+  At least 1 H2 / Meta description?
+• Are supporting/LSI keywords integrated naturally?
+• Is there any keyword stuffing (unnatural repetition)?
+• Are semantic variations used (e.g., synonyms, plural forms,
+  question formats)?
+• Keyword density: Is it 0.5–2% (healthy range)?
+
+Score: __ / 10
+Evidence: [Note keyword placement and any stuffing examples]
+
+──────────────────────────────────────
+PILLAR 6 — E-E-A-T (Experience, Expertise,
+           Authoritativeness, Trust) (0–10)
+──────────────────────────────────────
+• Does the content demonstrate FIRST-HAND experience or
+  subject-matter expertise?
+• Does it cite sources, references, or authoritative data?
+• Does it feel written by a human expert or a generic AI bot?
+• Are there trust signals? (Author bio, publish date,
+  citations, official sources?)
+• Would a Google Quality Rater score this as "High" quality?
+
+Score: __ / 10
+Evidence: [Specific line or section from the article]
+
+──────────────────────────────────────
+PILLAR 7 — FEATURED SNIPPET OPTIMIZATION (0–10)
+──────────────────────────────────────
+• Is there a concise 40–60 word direct-answer paragraph
+  near the top?
+• Are tables, numbered lists, or definitions structured
+  to be "snippet-grabbable"?
+• Does any section directly answer a "What is / How to /
+  Best / List of" format query?
+• Is the target keyword included in the snippet answer?
+
+Score: __ / 10
+Evidence: [Quote the potential snippet section]
+
+──────────────────────────────────────
+PILLAR 8 — SEMANTIC RICHNESS &
+           TOPICAL AUTHORITY (0–10)
+──────────────────────────────────────
+• Does the article use semantically related terms that
+  Google expects for this topic? (LSI keywords, entities,
+  co-occurring phrases)
+• Does it cover the topic broadly enough to signal
+  "topical authority" — or does it feel like a narrow,
+  isolated page?
+• Are sub-topics, related questions (PAA), or connected
+  concepts addressed?
+• Missing semantic terms that should appear:
+  [List 3–5 specific missing terms relevant to this article]
+
+Score: __ / 10
+Evidence: [Note what semantic terms are present vs. absent]
+
+──────────────────────────────────────
+PILLAR 9 — INFORMATION GAIN &
+           COMPETITIVE EDGE (0–10)
+──────────────────────────────────────
+This is the most important pillar for beating competitors.
+
+• Does this article provide ANYTHING the current Top 3
+  Google results do NOT already provide?
+• Is there a unique angle, original insight, exclusive data,
+  better formatting, or a helpful tool/table not seen
+  elsewhere?
+• Would a user BOOKMARK or SHARE this over a competitor's
+  version?
+• If all content is already available elsewhere in the same
+  format = score of 3 or below.
+
+Score: __ / 10
+Evidence: [State what unique value this article adds]
+
+──────────────────────────────────────
+PILLAR 10 — META & CTR OPTIMIZATION (0–10)
+──────────────────────────────────────
+• Meta Title: Is it 50–60 characters? Does it include the
+  primary keyword? Is it compelling enough to earn a click?
+• Meta Description: Is it 145–160 characters? Does it
+  include a benefit, call-to-action, or emotional hook?
+• Does the title avoid clickbait while still being enticing?
+• Would this title/description WIN the click against 9 other
+  results on the SERP?
+
+Score: __ / 10
+Evidence: [Paste the meta title + description for review]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+OUTPUT FORMAT — MANDATORY STRUCTURE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SECTION 1 — FINAL SCORE
+────────────────────────
+Overall Score: __ / 10
+(Calculated as the average of all 10 pillar scores)
+
+SECTION 2 — SCORE BREAKDOWN TABLE
+────────────────────────────────────
+| Pillar                        | Score | Key Finding (1 line) |
+|-------------------------------|-------|----------------------|
+| 1. Search Intent Alignment    | /10   |                      |
+| 2. Data Accuracy & Depth      | /10   |                      |
+| 3. Structure & Scannability   | /10   |                      |
+| 4. Zero-Fluff Compliance      | /10   |                      |
+| 5. Keyword Optimization       | /10   |                      |
+| 6. E-E-A-T & Trust            | /10   |                      |
+| 7. Featured Snippet           | /10   |                      |
+| 8. Semantic Richness          | /10   |                      |
+| 9. Information Gain           | /10   |                      |
+| 10. Meta & CTR Optimization   | /10   |                      |
+
+SECTION 3 — TOP 5 CRITICAL ISSUES
+────────────────────────────────────
+List the 5 most damaging issues hurting ranking potential.
+For each issue, state:
+  • What the problem is (specific, not vague)
+  • Why it hurts ranking
+  • The exact fix required
+
+SECTION 4 — THE REWRITE CHALLENGE
+────────────────────────────────────
+• Identify the SINGLE WEAKEST paragraph in the article
+• Quote it exactly as written
+• Rewrite it in High-Value, Zero-Fluff, SEO-optimized style
+• Explain in 1 sentence what you changed and why
+
+SECTION 5 — MISSING SEMANTIC KEYWORDS
+────────────────────────────────────────
+List 5–8 specific keywords, entities, or phrases that are:
+  a) Missing from the article
+  b) Expected by Google for this topic
+  c) Used by top-ranking competitors
+For each, suggest WHERE in the article to naturally add it.
+
+SECTION 6 — PRIORITY ACTION PLAN
+────────────────────────────────────
+Rank fixes by impact. Label each as:
+  🔴 HIGH IMPACT — Do immediately (ranking blocker)
+  🟡 MEDIUM IMPACT — Do within revision cycle
+  🟢 LOW IMPACT — Optional polish
+
+SECTION 7 — FINAL VERDICT
+──────────────────────────
+Choose EXACTLY ONE:
+
+✅ PUBLISH-READY
+   (Score 8.0+, no critical blockers found)
+
+⚠️ REVISE BEFORE PUBLISHING
+   (Score 5.0–7.9, fixable issues present)
+   → Must complete: [list specific sections to fix]
+
+❌ DO NOT PUBLISH — MAJOR REWORK REQUIRED
+   (Score below 5.0, or E-E-A-T / Intent failure)
+   → Reason: [state the single most disqualifying issue]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+AUDITOR RULES — NON-NEGOTIABLE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. NEVER give a score above 7 unless the criterion is
+   genuinely exceptional. Average content = average scores.
+2. NEVER use generic phrases like "good structure" or
+   "well-written." Every observation must be specific.
+3. If the article is AI-generated with no added human value,
+   the E-E-A-T score MUST be 4 or below.
+4. Information Gain score of 8+ requires citing a SPECIFIC
+   feature not found in current top 3 SERP results.
+5. The Final Verdict must MATCH the score range. No
+   exceptions — a 4.5 cannot be "Revise Before Publishing."
+6. Focus on RANKING POTENTIAL, not writing style.
+   Beautiful prose that doesn't rank = a failure.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
+
+/* ── FIELDS ── */
+const FIELDS = [
+  { id:'f_title',    key:'%%TITLE%%',    fb:'[INSERT ARTICLE / CONTENT TITLE]' },
+  { id:'f_primary',  key:'%%PRIMARY%%',  fb:'[INSERT PRIMARY KEYWORD]' },
+  { id:'f_lsi',      key:'%%LSI%%',      fb:'[INSERT 2–5 RELATED KEYWORDS]' },
+  { id:'f_niche',    key:'%%NICHE%%',    fb:'[e.g., Word Games, Health, Finance, Travel]' },
+  { id:'f_audience', key:'%%AUDIENCE%%', fb:'[e.g., Casual Wordle players, Beginner investors]' },
+  { id:'f_goal',     key:'%%GOAL%%',     fb:'[e.g., AdSense revenue, Lead generation, Brand authority]' },
+  { id:'f_article',  key:'%%ARTICLE%%',  fb:'[PASTE FULL ARTICLE HERE]' },
+];
+
+function buildPrompt() {
+  let out = TPL;
+  FIELDS.forEach(f => {
+    const el = document.getElementById(f.id);
+    const v = el ? el.value.trim() : '';
+    out = out.replace(f.key, v || f.fb);
+  });
+  return out;
+}
+
+/* ── LIVE PREVIEW ── */
+function updatePreview() {
+  const lines = buildPrompt().split('\n');
+  let html = '';
+  lines.forEach(ln => {
+    let cls = '';
+    if (/^[╔║╚]/.test(ln))                                      cls = 'sh';
+    else if (/^━/.test(ln))                                      cls = 'sh';
+    else if (/^──/.test(ln))                                     cls = 'sd';
+    else if (/^PILLAR \d+/.test(ln))                             cls = 'sh';
+    else if (/^(SECTION \d+|AUDITOR RULES)/.test(ln))            cls = 'sh';
+    else if (/^(ROLE|Content \/ Articles Key Points|EVALUATION FRAMEWORK|OUTPUT FORMAT)/.test(ln)) cls = 'sh';
+    else if (/^\d+\. NEVER/.test(ln))                            cls = 'sr';
+    else if (/[🔴🟡🟢✅⚠️❌]/.test(ln))                       cls = 'sy';
+
+    const filled = FIELDS.some(f => {
+      const el = document.getElementById(f.id);
+      const v = el ? el.value.trim() : '';
+      return v && ln.includes(v.split('\n')[0].slice(0,40));
+    });
+    const isPH = /\[(?:INSERT|PASTE|e\.g\.)/.test(ln);
+
+    if (filled && !isPH) cls = 'sf';
+    else if (isPH) cls = 'sph';
+
+    const e = ln.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    html += cls ? `<span class="${cls}">${e}</span>\n` : e + '\n';
+  });
+  document.getElementById('promptPreview').innerHTML = html;
+}
+
+/* ── COPY ── */
+const COPY_ICON = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+const CHECK_ICON = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 10l5 5L20 6"/></svg>`;
+
+function copyPrompt() {
+  const text = buildPrompt();
+  const btn = document.getElementById('copyBtn');
+  const done = () => {
+    btn.classList.add('copied');
+    btn.innerHTML = CHECK_ICON + ' Copied!';
+    document.getElementById('toast').classList.add('show');
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = COPY_ICON + ' Copy Full Prompt';
+      document.getElementById('toast').classList.remove('show');
+    }, 2600);
+  };
+  navigator.clipboard
+    ? navigator.clipboard.writeText(text).then(done).catch(() => fbCopy(text, done))
+    : fbCopy(text, done);
+}
+function fbCopy(text, cb) {
+  const ta = Object.assign(document.createElement('textarea'),
+    { value:text, style:'position:fixed;opacity:0;top:0;left:0' });
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
+  cb();
+}
+
+/* ── CLEAR ── */
+function clearInputs() {
+  FIELDS.forEach(f => { const el = document.getElementById(f.id); if(el) el.value=''; });
+  updatePreview();
+  document.getElementById('f_title').focus();
+}
+
+/* ── INIT ── */
+FIELDS.forEach(f => {
+  const el = document.getElementById(f.id);
+  if (el) el.addEventListener('input', updatePreview);
+});
+updatePreview();
+</script>
+</body>
+</html>
